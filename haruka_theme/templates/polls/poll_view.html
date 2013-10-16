@@ -1,0 +1,125 @@
+{% extends "polls/layout.html" %}
+{% load i18n %}
+{% block title %}{% trans "OpenSMS - Polls" %}{% endblock %}
+
+{% block content %}
+
+<script type="text/javascript">
+	
+	// Add a new box for entering a new category
+	function addNewCategoryBox() {
+		var newBox = $("#new_category_box").clone();
+		newBox.load( "{% url 'poll.views.add_category' poll.pk %}", function() {
+			newBox.show();
+			newBox.id = "category_box_" + Math.floor((new Date()).getTime() / 1000);
+			$('#poll_table').append(newBox);
+		});
+	}
+	
+	$(document).ready(function() {
+		// hide our new category template
+		$('#new_category_box').hide();
+		showPollDetails();
+		// if no categories, show the add new category form
+		if ({{category_count}} == 0) {
+			addNewCategoryBox();
+		}
+	});
+	
+	function showPollDetails() {
+	  $("#poll_header").load("{% url 'poll.views.view_poll_details' poll.pk %}");
+	}
+	
+	function deleteCategory(link, url) {
+	  if (confirm("Are you sure you want to delete this category?")) {
+      $.post(url, function(data) {
+        $(link).parents("tr").remove();
+      }); 
+    }
+  }
+  
+  function editCategory(link, url) {
+    $(link).parents("tr").load(url);
+    selected = $(("#selection_" + category_id));
+    selected.addClass('form_selected');
+    selected.removeClass('form_unselected');
+  }
+	
+  function saveCategory(link, form_action) {
+      form_data = $(link).parents("form").serializeArray();
+      $(link).parents("tr").load(form_action, form_data);
+  }
+  
+  function addCategory(link) {
+      form_data = $(link).parents("form").serializeArray();
+      $(link).parents("tr").load('{% url 'poll.views.add_category' poll.pk %}', form_data);    
+  }
+  
+  function cancelAdd(link) {
+      if (confirm("Are you sure you want to cancel this new category?")) {
+          $(link).parents("tr").remove();
+      }
+  }
+	
+	function cancelCategory(link, url) {
+        $(link).parents("tr").load(url);
+	}
+	
+	function editPollDetails() {
+	  $("#poll_header").load('{% url 'poll.views.edit_poll' poll.pk %}');
+	}
+	
+	function submitForm(link, resultDiv) {
+	    form = $(link).parents("form");
+        form_data = form.serializeArray();
+        $(resultDiv).load(form.attr("action"), form_data);
+	}
+	
+	// Trap our ajax errors and put them where we can see them
+	$.ajaxSetup({
+		error:function(x,e){
+			if(x.status==0){
+				$("#error").html("Oopsie, network not found.");
+			} else if(x.status>=400){
+				$("#error").html(x.responseText);	
+			}
+		}
+	});
+	
+</script>
+  <h4 style='margin-left:40px; margin-top: 45px;;'>{% trans "Polling Information" %}<blockquote><small> {% trans "here you can start or stop a poll. And if the polls not active make some minor changes." %}</small></blockquote></h4> 
+<div id="poll_header" class='well' style='margin-left:20px; width: 858px;'>
+</div>
+
+<form action="" style="width: 896px;">
+{% csrf_token %}
+<h4 style='margin-left:40px; margin-top:45px;margin-bottom:15px;'>{% trans "Edit your Poll's Details" %}<blockquote><small> {% trans "you can color code your SMS replies, and tailor the SMS response message to the various answers" %}</small></blockquote></h4>
+<table class="condensed-table" id="poll_table" style='margin-left:20px;'>
+<thead>
+<tr>
+<th class="category_name_col">{% trans "Name" %}</th>
+<th class="category_response_col">{% trans "Response Message" %}</th>
+<!--<th class="category_priority_col">Priority</th>-->
+<th class="category_color_col">{% trans "Color" %}</th>
+<th class="category_default_col">{% trans "Default" %}</th>
+<th class="category_options_col" style="width: 83px;"></th>
+</tr>
+</thead>
+{% for category in categories %}
+    <tr>
+        {% include "polls/category_view.html" %}
+    </tr>
+{% endfor %}
+<tr id="new_category_box">
+</tr>
+</table>
+</form>
+<br/>
+<div>
+    <a href="javascript:addNewCategoryBox();" style="float:left; margin-left:40px;'" class='btn primary'>
+      {% trans "Add New Category" %}
+    </a>
+</div>
+<br/><br/>
+<div id="error"></div>
+{% endblock %}

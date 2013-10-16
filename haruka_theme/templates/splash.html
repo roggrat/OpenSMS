@@ -1,0 +1,36 @@
+{% load i18n %}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<link type="text/css" rel="stylesheet" href="../static/haruka_theme/css/bootstrap-ext.css" />
+<link type="text/css" rel="stylesheet" href="../static/haruka_theme/css/bootstrap.css" />
+<style>
+
+	body {
+		background:  url("../static/haruka_theme/images/bg-login.png") repeat-x #B1DEEA;
+		color: #333333;
+		font: 9pt/1 "Helvetica","Arial";
+		padding: 0;
+		
+	  }
+	  
+	  .table {
+	  	border: none;
+	  }
+		
+		table td {
+		    border-top: none;
+		    vertical-align: top;
+	  } 	 	
+	
+	</style>
+	<body>
+	<img style="float: left;margin-left: -2px;" src="../static/haruka_theme/images/beta-ribbon.png">
+		<div id='logo-centre'>
+			<img style="margin-top: 148px; margin-left: 25px;" src="../static/haruka_theme/images/loginlogo.png">
+			<h4 style="margin-left: 204px; margin-top: 40px;">{% trans "Smushbox SMS is now loading..." %}</h4>
+			<div class="progress progress-info progress-striped active" style='margin-top: 10px'>
+			<div class="bar" style="width: 99.99%;">
+			</div>
+		</div>
+	</body>
+</html>

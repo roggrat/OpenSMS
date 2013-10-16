@@ -1,0 +1,184 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+{% load region_tags %}
+{% load tabs_tags %}
+{% load i18n %}
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+	<head>
+		<title>{% block title %}{% trans "OpenSMS - Activity" %}{% endblock %}</title>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+
+{% block stylesheets %}
+<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}stylesheets/layout.css" />
+<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}stylesheets/splits.css" />
+<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}stylesheets/modules.css" />
+<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}stylesheets/tables.css" />
+<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}stylesheets/forms.css" />
+<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}stylesheets/icons.css" />
+<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}haruka_theme/css/bootstrap-ext.css" />
+<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}haruka_theme/css/bootstrap.css" />
+<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}haruka_theme/css/font-awesome.css">
+<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}haruka_theme/css/custom.css" />
+{% endblock %}
+
+<script src="{{ STATIC_URL }}haruka_theme/js/jquery-1.7.1.min.js"></script>
+{% block javascripts %}
+<script type="text/javascript" src="{{ STATIC_URL }}javascripts/collapse.js"></script>
+{% endblock %}
+
+	</head>
+	<body>
+	
+		<div id="wrapper">
+			{% region "top" %}
+
+			{% block header %}
+			<div id="spacer">
+			<img style="float: left;margin-left: -2px;" src="">
+			</div>
+			<div id="header">
+				<div id="branding">
+					<h1>
+						<a title='{% trans "Return to the Dashboard" %}' href="{% url 'rapidsms-dashboard' %}">
+							<span>&nbsp;</span>
+						</a>
+					</h1>
+				</div>
+
+				{% block auth %}
+				<div id="auth">{% if user.is_authenticated %}
+					<a href="{% url 'rapidsms-logout' %}"><i class="icon-signout icon-large"></i><!--{{ user.username }}--></a>{% else %}
+					<a href="{% url 'rapidsms-login' %}">{% trans "Log in" %}</a>{% endif %}
+				</div>
+				{% endblock %}
+
+				{% get_tabs as tabs %}
+
+				<ul id="tabs">{% for tab in tabs %}
+					<li class="app-{{ tab.caption_slug }}{% if tab.is_active %} active{% endif %}">
+						<a href="{{ tab.url }}">
+							<span>{% trans tab.caption %}</span></a>
+					</li>{% endfor %}
+				</ul>
+
+				{% block page_tabs %}
+				{% endblock %}
+				
+				<span id="modem_status"></span>
+				<span id="settings">
+					<div class="toggle-settings-popup-button"></div>
+				</span>
+
+				<!-- Message list: errors, warnings and such -->
+				{% if context_instance.messages %}
+				<ul class="messagelist">
+				{% for message in context_instance.messages %}
+				  <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+				{% endfor %}</ul>
+				{% endif %}
+
+			</div>
+			{% endblock %}
+
+			<div id="inner">
+				{% block content %}{% endblock %}
+			</div>
+
+			{% block footer %}
+			<div id="footer">
+				<p class="rights" style="margin-top: 48px; margin-left: 0px; margin-right: 9px;">
+					{% trans " OpenSMS - Clean • Simple • Powerful    |    Supporting OpenSoucre Innovative Solutions    |    CopyLeft &copy; &#8211; 2013" %}
+				</p>
+
+<!--				{% region "footer" %}-->
+			</div>
+			{% endblock %}
+
+			{% region "bottom" %}
+		</div>
+		
+		<div id="settings_popup_wrapper" style="display: none;">
+			<div id="settings_popup_form">
+				<form>
+					<label for="">Language:</label>
+					<select id="language" name="language">
+						<option>English</option>
+					</select>
+					<br/><br/>
+					<label for="">Country Code:</label>
+					<select id="country_code" name="country_code">
+						<option>USA</option>
+						<option>UK</option>
+						<option>Germany</option>
+						<option>France</option>
+					</select>
+					<br/><br/>
+					<label for="">Cost of SMS:</label>
+					<input id="sms_cost" maxlength="160" type="text" name="sms_cost" size="60"/>
+					<br/><br/>
+					<a href="#">Change Password</a>
+					<br/><br/>
+					<input type="submit" value="Save" class="btn primary"/>
+				</form>
+			</div>
+		</div>
+<script src="{{ STATIC_URL }}haruka_theme/js/bootstrap-dropdown.js"></script>
+<script src="{{ STATIC_URL }}haruka_theme/js/bootstrap-collapse.js"></script>
+<script src="{{ STATIC_URL }}haruka_theme/js/bootstrap-button.js"></script>
+<script src="{{ STATIC_URL }}haruka_theme/js/bootstrap-modal.js"></script>
+<script src="{{ STATIC_URL }}haruka_theme/js/bootstrap-tooltip.js"></script>
+<script src="{{ STATIC_URL }}haruka_theme/js/bootstrap-popover.js"></script>
+<script type="text/javascript">
+	var modem_poll_update_interval=3000;
+	var settings_popup_shown = false;
+	function update_modem_status() {
+		var something = $.get("/router/modem_status", function(data) {
+			$('#modem_status .status-lights').tooltip('hide');
+			$("#modem_status").html(data);
+			$('#modem_status .status-lights').tooltip({title: "You are connected.", placement: "bottom"});
+		});
+	}
+	
+	function init_settings_popup(){
+		settings_popup_content = $('#settings_popup_wrapper').html();
+		$('#settings .toggle-settings-popup-button').popover({
+			title: "Settings", 
+			html: true, 
+			placement: "bottom",
+			trigger: "manual",
+			content: settings_popup_content
+		});
+	}
+	
+	$(function(){
+		$('#myModal').modal('show');
+		$('#myModal').modal('hide');
+		$('#myModal').modal('toggle');
+		
+		init_settings_popup();
+		
+		$('#settings .toggle-settings-popup-button').on('click', function(){
+			if (settings_popup_shown){
+				$('#settings .toggle-settings-popup-button').popover('hide');
+				settings_popup_shown = false;
+			}
+			else{
+				$('#settings .toggle-settings-popup-button').popover('show');
+				settings_popup_shown = true;
+				var move_dist = -105;
+				var new_settings_popup_left = $('#settings .popover').offset().left + move_dist;
+				var new_settings_popup_arrow_left = $('#settings .toggle-settings-popup-button').offset().left - 2;
+				$('#settings .popover').offset({left: new_settings_popup_left});
+				$('#settings .popover .arrow').offset({left: new_settings_popup_arrow_left});
+				$('#settings .popover .arrow').offset({left: new_settings_popup_arrow_left});
+			}
+		});
+		
+		window.setInterval(update_modem_status, modem_poll_update_interval);
+	});
+	
+</script>
+</body>
+</html>

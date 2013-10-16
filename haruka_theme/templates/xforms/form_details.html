@@ -1,0 +1,13 @@
+{% load i18n %}
+ <div>
+    <a onclick="editFormDetails('{{xform.pk}}');" href="javascript:void(0);" class='btn'>
+        {% trans "Edit" %}
+    </a>
+    <a href="/xforms/odk/get/{{ xform.pk }}/" class='btn'>     
+        {% trans "XForm" %}
+    </a>
+    </div>
+
+    <div class="name">{{xform.name}} <span class="keyword">({{xform.keyword}})</span></div>
+    <div class="description">{{xform.description}}</div>
+    <div class="response">Response: {{xform.response}}</div>

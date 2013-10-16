@@ -1,0 +1,19 @@
+{% load i18n %}
+<div class="name">{% trans "Edit" %} '{{xform.name}}'</div>
+{% load forms %}
+
+<form action="/xforms/{{xform.pk}}/edit/" method="post" class="uniForm">
+{% csrf_token %}
+{{ form|render_layout }}
+
+<div class="buttons" style="position: relative; top: -112px; left: 252px;">
+  <div class='btn' onclick="showFormDetails('{{xform.pk}}');" href="javascript:void(0);" class="negative">
+    {% trans "Cancel" %}
+  </div>
+  <div class='btn primary' onclick="submitForm(this, '#form_header');" href="javascript:void(0);">
+    {% trans "Save Form Details" %}
+  </div>
+</div>
+
+</form>
+

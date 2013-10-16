@@ -1,0 +1,40 @@
+{% extends "xforms/layout.html" %}
+{% load i18n %}
+{% block title %}{% trans "OpenSMS - Data Collection" %}{% endblock %}
+
+{% block content %}
+{% load forms %}
+
+<!--<style>
+
+.uniForm .ctrlHolder {
+    border-bottom: none;
+    padding: 7px;
+}
+
+</style>-->
+
+	<h4 style='margin-top:45px; margin-left:150px;'>{% trans "Data Collection" %}<blockquote><small> {% trans "For more data intensive survey work design a SMS survey with keywords and multiple answers." %}</small></blockquote>
+	</h4>
+	
+	
+	<div id='newForm2'>
+		<form action="/xforms/new/" method="post" class="uniForm" id='newForm'>
+			<fieldset>
+				{{ form|render_layout }}
+				<div class='form-buttons'>
+					<a class='btn' href="/xforms/">
+					{% trans "Cancel" %}
+					</a>
+					<a class="btn primary" onclick="$('#newForm').submit();" href="javascript:void(0);" >
+					{% trans "Create Form" %}
+					</a>
+				</div>
+				
+				{% csrf_token %}
+				
+			</fieldset>
+		
+		</form>
+	</div>
+{% endblock %}

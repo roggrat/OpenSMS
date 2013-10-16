@@ -1,0 +1,61 @@
+{% extends "bulksend/base.html" %}
+{% load forms_tags %}
+{% load i18n %}
+{% block stylesheets %}
+{{ block.super }}
+<!--<link type="text/css" rel="stylesheet" href="{{ MEDIA_URL }}registration/stylesheets/dashboard.css" />-->
+
+{% endblock %}
+
+{% block content %}
+
+<h4 id="header-space-review">{% trans "SMS Campaign Summary" %}</h4>
+<div class="form_bulk_send" id="form_bulk_send">
+
+    <form action='/bulksend/' method="POST">
+        <div class="well SMS-review">
+                <div class="tally">
+                    <input type="hidden" name="group_id"
+                           value="{{group.pk}}"/>
+                    <input type="hidden" name="message"
+                           value="{{m_text}}"/>
+                    
+                    <div>
+                  		<p><h5>{% trans "Message:" %}</h5>{{m_text}}</p> 
+                  		<p><h5>{% trans "Group:" %}</h5>{{g_name}}</p>
+                    </div>
+                        <table>
+                            <tbody>
+                                <tr class="row_rez">
+                                     <td class="col_0">{% trans "Number of SMS per message:" %}</td>
+                                    <td class="col_1">{{m_count}}</td>
+                                <tr>
+                                    <td class="col_0">{% trans "Group size:" %}</td>
+                                    <td class="col_1">{{g_size}}</td>
+                                    
+                                </tr>
+                                <tr class="row_rez">
+                                    <td class="col_0">{% trans "Number of SMS to send:" %}</td>
+                                    <td class="col_1">{{sms_count}}</td>
+                                </tr>
+                                <tr>
+                                    <td class="col_0">{% trans "Cost per SMS:" %}</td>
+                                    <td class="col_1">{{sms_cost}}</td>
+                                </tr>
+                                <tr class="row_rez row_rez_final">
+                                    <td class="col_0">{% trans "Total Cost:" %}</td>
+                                    <td class="col_1" id="c_count">US$ {{send_price}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                            <input onclick="javascript:showSpinnerAndRedirect('form_bulk_send')" type="submit" class="btn large danger SMS-Send" value="Send Message to {{g_size}} contacts"/>
+                </div>
+            </div>
+    </form>
+</div>
+<div id="spinner" style="display:none">
+    <p>{% trans "Please be patient. This may take a few minutes" %}</p>
+    <br/>
+    <img src="/static/bulksend/images/big_spinner_336699.gif"/>
+</div>
+{% endblock %}

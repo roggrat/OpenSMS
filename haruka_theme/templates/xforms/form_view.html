@@ -1,0 +1,230 @@
+{% extends "xforms/layout.html" %} {% load i18n %} {% block title %}{% trans "OpenSMS - Data Collection" %}{% endblock %}
+
+{% block content %}
+<script type="text/javascript">
+
+	// send the current field order to the server
+	function updateOrder() {
+		delim = "";
+		sub = "";
+
+		$("#sortable .field_table").each(function() {
+			if (this.id != "") {
+				sub += delim + this.id;
+				delim = ",";
+			}
+		});
+
+		if (sub != "") {
+			$.post("/xforms/{{xform.pk}}/order/",{'order':sub});
+		}
+	}
+
+	// Create our sortable widget and handle any sort events
+	$(function() {
+		$("#sortable").sortable({ update: updateOrder, delay: 0, distance: 20, handle: '.grippy' });
+		$("#sortable").disableSelection();
+	});
+	
+	// Add a new box for entering a new field
+	function addNewFieldBox() {
+		var newBox = $("#new_field_box").clone();
+		newBox.load( "/xforms/" + {{ xform.pk }} + "/add_field/", function() {
+			newBox.show();
+			newBox.id = "field_box_" + Math.floor((new Date()).getTime() / 1000);
+			$("#sortable").append(newBox);
+		});
+		
+	}
+	
+	$( document ).ready( function() {
+
+		// hide our new field template
+		$('#new_field_box').hide();
+		
+		$(".field_box").each(function() {
+			field_id = $(this).parent().attr("id");
+			if (field_id) {
+				$(this).load("/xforms/{{xform.pk}}/field/" + field_id + "/");
+			}
+		});
+		
+		showFormDetails();
+		
+		// if no fields, show the add new field form
+		if ({{field_count}} == 0) {
+			addNewFieldBox();
+		}
+		
+	});
+	
+	function showFormDetails() {
+	  $("#form_header").load("/xforms/{{xform.pk}}/details/");
+	}
+	
+	function deleteField(link) {
+	  field_id = $(link).parents(".field_table").attr("id");
+	  if (confirm("Are you sure you want to delete this field?")) {
+      $.post('/xforms/{{xform.pk}}/delete_field/' + field_id + "/", function(data) {
+        $(link).parents(".field_box").remove();
+      }); 
+    }
+  }
+  
+  function editField(link) {
+    field_id = $(link).parents(".field_table").attr("id");
+    url = "/xforms/" +  {{xform.pk}} + "/edit_field/" + field_id + "/";
+    $(link).parents(".field_box").load(url);
+    selected = $(("#selection_" + field_id));
+    selected.addClass('form_selected');
+    selected.removeClass('form_unselected');
+  }
+  
+  function showConstraints(link) {
+    field_id = $(link).parents(".field_table").attr("id");
+    url = "/xforms/" +  {{xform.pk}} + "/edit_field/" + field_id + "/";
+    
+  }
+	
+	function saveField(link) {
+    form = $(link).parents(".form");
+    form_data = form.serializeArray();
+    form.parents(".field_box").load(form.attr("action"), form_data);
+  }
+  
+  function cancelAdd(link) {
+    if (confirm("Are you sure you want to cancel this new field?")) {
+      $(link).parents(".field_box").remove();
+    }
+  }
+	
+	function cancelField(link) {
+	   field_id = $(link).parents(".field_table").attr("id");
+     $(link).parents(".field_box").load("/xforms/{{xform.pk}}/field/" + field_id + "/");
+	}
+	
+	function editFormDetails(form_id) {
+	  $("#form_header").load("/xforms/" + form_id + "/edit/");
+	}
+	
+	function submitForm(link, resultDiv) {
+	  form = $(link).parents("form");
+    form_data = form.serializeArray();
+    console.log(resultDiv);
+    console.log($(resultDiv));
+    $(resultDiv).load(form.attr("action"), form_data);
+	}
+	
+	// Trap our ajax errors and put them where we can see them
+	$.ajaxSetup({
+		error:function(x,e){
+			if(x.status==0){
+				$("#error").html("Oopsie, network not found.");
+			} else if(x.status>=400){
+				$("#error").html(x.responseText);	
+			}
+		}
+	});
+	
+</script>
+<style>
+.field_name_col{
+	padding-left:20px !important;
+}
+.field_type_col{
+	padding-left:40px !important;
+}
+.field_command_col{
+	padding-left:85px !important;
+	width: 74px !important;
+}
+.field_description_col{
+	padding-left:10px !important;
+}
+.field_options_col{
+	margin-right:10px !important;
+}
+
+form table.field_table .field_name_col{
+	padding-left:10px !important;
+}
+form table.field_table .field_type_col{
+	padding-left:20px !important;
+}
+form table.field_table .field_command_col{
+	padding-left:10px !important;
+	width: 74px !important;
+}
+form table.field_table .field_description_col{
+	padding-left:10px !important;
+}
+form table.field_table .field_options_col{
+	margin-right:10px !important;
+}
+
+.field_table td.field_options_col a.btn{
+	float: left;
+	margin-right: 0px;
+	margin-bottom: 5px;
+}
+
+.edit_field form table.field_table .field_options_col a img{
+	left: 19px;
+	position: relative;
+}
+
+.add_field form table.field_table .field_options_col a.positive{
+	float: left;
+	margin-left: 4px;
+}
+.add_field form table.field_table .field_options_col a img{
+	left: 26px;
+	position: relative;
+}
+
+
+</style>
+<h4 style="margin-left:20px; margin-top: 45px">{% trans "Data Collection Campaign Overview" %}</h4>
+<div class="well" style="width:858px; margin-left:20px;" id="form_header">
+   
+</div>
+<h4 style="margin-left:20px; margin-top: 45px; margin-bottom:10px;">{% trans "Your Data Collection Code Words<blockquote><small>just think of each new field like a new column in excel - so with more columns you can record more data with each survey!" %}</small></blockquote></h4>
+<table class="condensed-table" style='width:858px; margin-left:20px'>
+<thead>
+<tr>
+<th class="field_name_col" style='padding-left:20px;'>{% trans "Title" %}</th>
+<th class="field_type_col" style='padding-left:40px;'>{% trans "Data Type" %}</th>
+<th class="field_command_col" style='padding-left:85px; width: 74px;'>{% trans "Short Code" %}</th>
+<th class="field_description_col" style='padding-left:15px;'>{% trans "Description" %}</th>
+<th class="field_options_col" style='margin-right:10px;'></th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="form_fields_cell" colspan="5">
+			<ul id="sortable">
+				{% for field in fields %}
+				<li class="field ui-state-default form_unselected" id="{{field.pk}}">
+					<div class="field_box" id="field_box_{{forloop.counter}}">
+					</div>
+				</li>
+				{% endfor %}
+
+				<li class="field ui-state-default form_unselected">
+					<div class="field_box" id="new_field_box"></div>
+				</li>
+			</ul>
+</td></tr>
+</tbody>
+</table>
+<br/>
+<div>
+    <a href="javascript:addNewFieldBox();" class='btn primary'>
+      {% trans "Add New Field" %}
+    </a>
+  </div>
+<br/><br/>
+
+
+<div id="error"></div>
+
+{% endblock %}

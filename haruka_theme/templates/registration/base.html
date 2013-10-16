@@ -1,0 +1,9 @@
+{% extends "layout.html" %}
+{% load i18n %}
+
+{% block stylesheets %}
+{{ block.super }}
+<link type="text/css" rel="stylesheet" href="{{ MEDIA_URL }}registration/stylesheets/base.css" />
+{% endblock %}
+
+{% block title %}{% trans "OpenSMS - Contacts" %}{% endblock %}

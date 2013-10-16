@@ -1,0 +1,83 @@
+{% extends "bulksend/base.html" %}
+{% load forms_tags %}
+{% load i18n %}
+{% block stylesheets %}
+{{ block.super }}
+<!--<link type="text/css" rel="stylesheet" href="{{ MEDIA_URL }}registration/stylesheets/dashboard.css" />-->
+{% endblock %}
+
+
+{% block content %}
+
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <li{% if message.tags %} class="alert-message {{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+<h4 id="bulk-SMS">{% trans "Send SMS to Group" %}</h4>
+<form action='/bulksend/review/' method="POST">
+  <script content="text/javascript">
+    var sms_length = {{ sms_length }};
+      var sms_cost = {{ sms_cost }};
+  </script>
+<div class="well bulk">
+      <div>
+          <select name='group_id'>
+              {% for group in groups %}
+              <option value="{{ group.pk }}"> {{ group.name }} </option>
+              {% endfor %}
+          </select>
+      </div>
+  </div>
+  <div class="row">
+	  <div class="span4">
+		<h4>{% trans "Message" %}</h4><blockquote id="SMS-help"><small> {% trans "for mail merge type [name] or [firstname]" %}</small></blockquote>
+		<div class="well SMS-message">
+			<div class="input, textarea">
+		          <textarea name="message"
+		                    cols="60"
+		                    id="message"
+		                    rows="25"
+		                    onKeyDown="countChars('message','c_count','sms_count','msg_price')"
+		                    onKeyUp="countChars('message','c_count','sms_count','msg_price')"></textarea>
+		     </div>
+		  </div>
+	  </div>
+	  <div class="span7 offset4">
+		<div class="bordered">
+		  <table id="cost-calculator">
+		    <thead><tr><th colspan="1"><h4 id="cost-calc">{% trans "Cost Calculator:" %}</h4></th></tr></thead>
+		    <tbody>
+		        <tr>
+		        	<td class="col_1" id="c_count">0</td>
+		        	<td>{% trans "Characters" %}</td>
+		        </tr>
+		        <tr>
+		        	<td class="col_1" id="sms_length">{{ sms_length }}</td>
+		        	<td>{% trans "Characters per SMS" %}</td>
+		        </tr>
+		        <tr>
+		        	<td class="col_1" id="sms_count">0</td>
+		        	<td>{% trans "SMS per Message" %}</td>
+		        </tr>
+		        <tr class="last_row">
+		        	<td class="col_1" id="msg_price">US$0</td>
+		        	<td>{% trans "Per Contact" %}</td>
+		        </tr>
+		    </tbody>
+		  </table>
+		</div>
+	  </div>
+    </div>
+    
+	<div>
+
+		<input class="btn large primary send-SMS" type="submit" value='{% trans "Confirm Message" %}'>
+	</div>
+	
+
+</form>
+{% endblock %}

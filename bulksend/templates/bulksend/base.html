@@ -1,0 +1,13 @@
+{% extends "layout-split-2.html" %}
+
+{% block stylesheets %}
+{{ block.super }}
+<link type="text/css" rel="stylesheet" href="{{ MEDIA_URL }}registration/stylesheets/base.css" />
+<link type="text/css" rel="stylesheet" href="/static/bulksend/stylesheets/bulk_review.css"/>
+<script type="text/javascript" rel="javascript" src="/static/bulksend/js/utils.js"/>
+<link type="text/css" rel="stylesheet" href="/static/haruka_theme/css/bootstrap.css" />
+<link type="text/css" rel="stylesheet" href="/static/haruka_theme/css/custom.css" />
+
+{% endblock %}
+
+{% block title %}Bulk Messaging - {{ block.super }}{% endblock %}

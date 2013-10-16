@@ -1,0 +1,23 @@
+{% extends "groups/base.html" %}
+{% load i18n %}
+{% block title %}Delete Group{% endblock %}
+
+{% block javascripts %}
+    {{ block.super }}
+    <script src="{{ STATIC_URL }}js/forms.js" type="text/javascript"></script>
+{% endblock %}
+
+{% block content %}
+    <h4>{% trans "Delete Group" %}</h4>
+    <div class="well"> 
+        <form method="POST" action="#" class='buttons'>
+            <p class='message'>{% trans "Are you sure you want to delete the group named" %} {{ group }}?</p>
+            {% csrf_token %}
+            <div class='form-action'>
+                <a href='/groups/group/' class='btn'> {% trans "Cancel" %} </a>
+                <input type='submit' name='submit' value="Delete" class='btn danger' />
+            </div>
+        </form>
+    </div>
+{% endblock %}
+

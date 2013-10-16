@@ -1,0 +1,11 @@
+{% extends "layout-split-2.html" %}
+{% load i18n %}
+{% block title %}{% trans "Goodbye" %}{% endblock %}
+{% block content %}
+
+<div id='logout-centre'>
+	<h2>{% trans "Thanks for using OpenSMS" %}</h2>
+	<h4>{% trans "See you again soon!" %}</h4>
+	<a href="{% url 'rapidsms-login' %}">{% trans "Log in again" %}</a>
+</div>
+{% endblock %}

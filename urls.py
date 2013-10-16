@@ -1,0 +1,58 @@
+from django.conf.urls.defaults import *
+from django.conf import settings
+from django.contrib import admin
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+#from rapidsms.backends.kannel.views import KannelBackendView
+from poll import views
+
+admin.autodiscover()
+
+
+urlpatterns = patterns('',
+
+    # Uncomment the admin/doc line below to enable admin documentation:
+    # (r'^admin/doc/', include('django.contrib.admindocs.urls')),
+
+    (r'^admin/', include(admin.site.urls)),
+    #Kannel Backend
+    #url(r"^backend/kannel-ttyO1-smsc/$",KannelBackendView.as_view(backend_name="kannel-ttyO1-smsc")),
+    #url(r'^kannel/', include('rapidsms.backends.kannel.urls')),
+    # RapidSMS core URLs
+    (r'^account/', include('rapidsms.urls.login_logout')),
+
+    url(r'^$', views.dashboard, name='rapidsms-dashboard'),
+    url(r'^activity_as_csv/$', views.activity_as_csv),
+
+    # RapidSMS contrib app URLs
+    (r'^ajax/', include('rapidsms.contrib.ajax.urls')),
+    (r'^export/', include('rapidsms.contrib.export.urls')),
+    (r'^httptester/', include('rapidsms.contrib.httptester.urls')),
+    (r'^locations/', include('rapidsms.contrib.locations.urls')),
+    (r'^messagelog/', include('rapidsms.contrib.messagelog.urls')),
+    (r'^messaging/', include('rapidsms.contrib.messaging.urls')),
+    (r'^scheduler/', include('rapidsms.contrib.scheduler.urls')),
+
+    # Haruka specific
+    (r'^registration/', include('registration.urls')),
+    (r'^groups/', include('groups.urls')),
+    (r'^bulksend/', include('bulksend.urls')),
+    ('', include('rapidsms_xforms.urls')),
+    ('^polls/', include('poll.urls')),
+    ('', include('rapidsms_httprouter.urls')),
+)
+
+if 'rosetta' in settings.INSTALLED_APPS:
+    urlpatterns += patterns('',
+        url(r'^rosetta/', include('rosetta.urls')),
+    )
+
+urlpatterns += patterns('',
+    # helper URLs file that automatically serves the 'static' folder in
+    # INSTALLED_APPS via the Django static media server (NOT for use in
+    # production)
+    (r'^', include('rapidsms.urls.static_media')),
+    url(r'^static/(?P<path>.*)$', 'django.views.static.serve',
+        {'document_root': settings.STATIC_ROOT,}),
+ 
+)
+urlpatterns += staticfiles_urlpatterns()

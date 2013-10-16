@@ -1,0 +1,83 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<link type="text/css" rel="stylesheet" href="/static/haruka_theme/css/bootstrap.css" />
+<style>
+	body {
+		background:  url("/static/haruka_theme/images/bg-login.png") repeat-x #B1DEEA;
+		color: #333333;
+		font: 9pt/1 "Helvetica","Arial";
+		padding: 0;
+	}
+
+	.table {
+		border: none;
+	}
+
+	table td {
+		border-top: none;
+		vertical-align: top;
+	}
+
+	table td label {
+		margin-left: 100px;
+	}
+	
+	p.login-error{
+		margin-left: 160px;
+	}
+
+</style>
+
+{% load region_tags %}
+{% load tabs_tags %}
+{% load i18n %}
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+	<head>
+		<title>{% block title %}{% trans "Login" %}{% endblock %}</title>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+		{% block content %}
+		
+	
+		{% if user.is_authenticated %}
+		<p>{% trans "You're already logged in!" %}</p>
+		
+		{% else %}
+		
+		<body>
+		<img style="float: left; margin-left: -2px;" src="/static/haruka_theme/images/beta-ribbon.png">
+		<div id='logo-centre'>
+		<img style="margin-top: 148px; margin-left: 25px;" src="/static/haruka_theme/images/loginlogo.png">
+		
+		<form method="post" action="{% url 'rapidsms-login' %}">
+		<table>
+			<tr>
+				<td style="width: 200px;"></td>
+				<td>
+					<h5 style="margin-top: 40px;">{% trans "Please log in to Smushbox SMS" %}</h5>
+				</td>
+			</tr>
+			
+			<tr>
+				<td>{{ form.username.label_tag }}</td>
+				<td>{{ form.username }}</td>
+			</tr>
+			<tr>
+				<td>{{ form.password.label_tag }}</td>
+				<td>{{ form.password }}</td>
+			</tr>
+		</table>
+		{% csrf_token %}
+		<input class="btn primary" type="submit" value="login" style="margin-left: 422px;">
+		<input type="hidden" name="next" value="{{ next }}" />
+		</form>
+		{% if form.errors %}
+		<p class="login-error">{% trans "Oops. Your username and password didn't match. Please try again." %}</p>
+		{% endif %}
+		
+		</div>
+		{% endif %}
+		{% endblock %}
+	</body>
+</html>

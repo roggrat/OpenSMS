@@ -1,0 +1,87 @@
+{% extends "groups/base.html" %}
+{% load pagination_tags sorting_tags %}
+{% load i18n %}
+
+{% block title %}{% if form.instance.pk %}{% trans "OpenSMS - Edit Group" %}{% else %}{% trans "OpenSMS - Create Group" %}{% endif %}{% endblock %}
+
+{% block stylesheets %}
+<link rel="stylesheet" type="text/css" href="/static/admin/css/forms.css" />
+<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}groups/css/ui.multiselect.css" />
+    {{ block.super }}
+{% endblock %}
+
+{% block javascripts %}
+{{ block.super }}
+
+<script type="text/javascript" src="/admin/jsi18n/"></script>
+<script type="text/javascript" src="/static/admin/js/core.js"></script>
+<script type="text/javascript" src="/static/admin/js/admin/RelatedObjectLookups.js"></script>
+<script type="text/javascript" src="/static/admin/js/jquery.min.js"></script>
+<script type="text/javascript" src="/static/admin/js/jquery.init.js"></script>
+<script type="text/javascript" src="/static/admin/js/actions.min.js"></script>
+<script type="text/javascript" src="/static/admin/js/SelectBox.js"></script>
+<!--<script type="text/javascript" src="/static/admin/js/SelectFilter2.js"></script>-->
+<script type="text/javascript" src="/static/admin/js/calendar.js"></script>
+<script type="text/javascript" src="/static/admin/js/admin/DateTimeShortcuts.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}haruka_theme/js/SelectFilter2.js"></script>{% endblock %}
+
+{% block content %}
+
+{% if messages %}
+	<ul class="messages">
+	    {% for message in messages %}
+	    <li{% if message.tags %} class="alert-message {{ message.tags }}"{% endif %}>{{ message }}</li>
+	    {% endfor %}
+	</ul>
+{% endif %}
+
+
+	<h4 id="groups-create">{% if form.instance.pk %}{% trans "Edit Group" %}{% else %}{% trans "Create Group" %}{% endif %}</h4>
+	<div class="row">
+		    <div class="well span7" id="reg-well">
+	    		<form action="#" method="POST" class="buttons">
+	    			{% csrf_token %}
+                    <p class="group_field_name">
+                    	<span id="description_padding">{% trans "Name:" %}</span>
+	    				<span class="field">{{ form.name }}</span>
+                    </p>
+                    <p class="group_field_desc">
+                        <span id="description_padding">{% trans "Description:" %}</span>
+                        <span class="field">{{ form.description }}</span>
+                    </p>
+                    <p class="group_field_contacts">
+                        <span class="field">{{ form.contacts }}</span>
+                    </p>
+	    			<div class='form-action'>
+	    				{% if form.instance.pk %}
+	    				<a href="/groups/group/{{form.instance.pk}}/delete" class='btn danger'>{% trans "Delete Group" %}</a>
+	    				{% endif %}
+	    				<input type='submit' name='submit' class='btn primary' value="Save" />
+	    			</div>
+	    		</form>
+		    </div>
+		    <div class="span7">
+		    <h4 id="group-list">{% trans "Group List" %}</h4>
+		    	<table class='table' >
+		    		<thead>
+		    			<tr>
+		    				<th>{% anchor id "Group ID Number" %}</th>
+		    				<th>{% anchor name Name %}</th>
+		    				<th>{% anchor count "Number Recipients" %}</th>
+		    			</tr>
+		    		</thead>
+		    		<tbody>
+		    			{% for group in groups %}
+		    				<tr class="{% cycle 'odd' 'even' %}">
+		    					<td>{{ group.pk }}</td>
+		    					<td><a href='{% url 'edit-group' group.pk %}'>{{ group.name }}</a></td>
+		    					<td>{{ group.count }}</td>
+		    				</tr>
+		    			{% endfor %}
+		    		</tbody>
+		    	</table>
+		    </div>
+	  </div>
+
+
+{% endblock %}
